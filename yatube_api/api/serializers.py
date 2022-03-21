@@ -1,5 +1,6 @@
-from posts.models import Comment, Follow, Group, Post, User
 from rest_framework import serializers
+
+from posts.models import Comment, Follow, Group, Post, User
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -11,7 +12,6 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'author', 'text', 'pub_date', 'image', 'group')
-        read_only_fields = ('author',)
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -55,9 +55,10 @@ class FollowSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def validate(self, data):
-        if self.context['request'].user == data['following']:
+    def validate_following(self, following):
+        user = self.context.get('request').user
+        if user == following:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя'
             )
-        return data
+        return following

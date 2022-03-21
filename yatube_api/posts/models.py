@@ -43,13 +43,21 @@ class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='user',
+        related_name='following',
     )
     following = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='following',
+        related_name='user',
     )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_following'
+            ),
+        )
 
     def __str__(self) -> str:
         return self.user.username
